@@ -1,0 +1,9 @@
+query Query {
+    field
+}
+
+mutation Mutation {
+    mutation(arg: "value") {
+        field
+    }
+}
