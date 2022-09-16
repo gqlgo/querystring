@@ -1,6 +1,6 @@
 module github.com/gqlgo/querystring
 
-go 1.18
+go 1.19
 
 require github.com/vektah/gqlparser/v2 v2.5.0
 

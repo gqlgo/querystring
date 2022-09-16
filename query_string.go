@@ -79,11 +79,7 @@ func processFile(filename string, in io.Reader, out io.Writer) error {
 }
 
 func queryString(b []byte) ([]byte, error) {
-	stringLiteral, err := stringLiteral(b)
-	if err != nil {
-		return nil, fmt.Errorf(": %w", err)
-	}
-
+	stringLiteral := stringLiteral(b)
 	formatQuery, err := formatQuery(stringLiteral)
 	if err != nil {
 		return []byte{}, nil
@@ -93,7 +89,7 @@ func queryString(b []byte) ([]byte, error) {
 	return formatQuery, nil
 }
 
-func stringLiteral(b []byte) ([]byte, error) {
+func stringLiteral(b []byte) []byte {
 	var queryString []byte
 	var start int
 
@@ -107,7 +103,7 @@ func stringLiteral(b []byte) ([]byte, error) {
 		}
 	}
 
-	return queryString, nil
+	return queryString
 }
 
 func singleQueryString(b []byte, start int) ([]byte, int) {
