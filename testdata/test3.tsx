@@ -1,10 +1,10 @@
-const Tes2Query = gql(/* GraphQL */ `
+const Test3Query = gql(/* GraphQL */ `
     query Query {
         field
     }
 `);
 
-const Test2Mutation = gql(/* GraphQL */ `
+const Test3Mutation = gql(/* GraphQL */ `
     mutation Mutation {
         mutation(arg: "value") {
             field

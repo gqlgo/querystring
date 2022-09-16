@@ -66,11 +66,7 @@ func processFile(filename string, in io.Reader, out io.Writer) error {
 		return fmt.Errorf(": %w", err)
 	}
 
-	queryString, err := queryString(src)
-	if err != nil {
-		return fmt.Errorf(": %w", err)
-	}
-
+	queryString := queryString(src)
 	if len(queryString) > 0 {
 		fmt.Fprintf(out, string(queryString))
 	}
@@ -78,35 +74,28 @@ func processFile(filename string, in io.Reader, out io.Writer) error {
 	return nil
 }
 
-func queryString(b []byte) ([]byte, error) {
-	stringLiteral := stringLiteral(b)
-	formatQuery, err := formatQuery(stringLiteral)
-	if err != nil {
-		return []byte{}, nil
-
-	}
-
-	return formatQuery, nil
-}
-
-func stringLiteral(b []byte) []byte {
-	var queryString []byte
+func queryString(b []byte) []byte {
+	var queryStrings [][]byte
 	var start int
 
 	for {
-		q, end := singleQueryString(b, start)
-		queryString = append(queryString, q...)
-		start = start + end + 1
+		stringLiteral, end := singleStringLiteral(b, start)
+		start = end + 1
+
+		query, isQuery := formatQuery(stringLiteral)
+		if isQuery {
+			queryStrings = append(queryStrings, query)
+		}
 
 		if start >= len(b) {
 			break
 		}
 	}
 
-	return queryString
+	return bytes.Join(queryStrings, []byte(""))
 }
 
-func singleQueryString(b []byte, start int) ([]byte, int) {
+func singleStringLiteral(b []byte, start int) ([]byte, int) {
 	begin, end := -1, -1
 	for i, c := range b[start:] {
 		if c == '`' {
@@ -125,16 +114,16 @@ func singleQueryString(b []byte, start int) ([]byte, int) {
 	return b[start+begin+1 : start+end], start + end
 }
 
-func formatQuery(src []byte) ([]byte, error) {
+func formatQuery(src []byte) ([]byte, bool) {
 	source := &ast.Source{Name: "", Input: string(src)}
 
 	query, err := parser.ParseQuery(source)
 	if err != nil {
-		return nil, fmt.Errorf(": %w", err)
+		return nil, false
 	}
 
 	var buf bytes.Buffer
 	astFormatter := formatter.NewFormatter(&buf)
 	astFormatter.FormatQueryDocument(query)
-	return buf.Bytes(), nil
+	return buf.Bytes(), true
 }

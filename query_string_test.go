@@ -7,13 +7,12 @@ import (
 	"testing"
 )
 
-func TestRun(t *testing.T) {
+func TestQueryString(t *testing.T) {
 	type args struct {
 		fileName string
 	}
 	type want struct {
 		queryFileName string
-		err           error
 	}
 	tests := []struct {
 		name string
@@ -61,18 +60,12 @@ func TestRun(t *testing.T) {
 			if err != nil {
 				t.Errorf("Read %v failed", tt.want.queryFileName)
 			}
-			wantFormatQuery, err := formatQuery(wantB)
-			if err != nil {
-				t.Errorf("want format failed: %v\n%s", err, wantB)
-			}
+			wantFormatQuery, _ := formatQuery(wantB)
 
 			// got format query
-			gotFormatQuery, err := queryString(argB)
-			if err != tt.want.err {
-				t.Errorf("want:%v got:%v", tt.want.err, err)
-			}
-			if !bytes.Equal(wantFormatQuery, gotFormatQuery) {
-				t.Errorf("want:\n%s\n got:\n%s", wantFormatQuery, gotFormatQuery)
+			got := queryString(argB)
+			if !bytes.Equal(wantFormatQuery, got) {
+				t.Errorf("want:\n%s\n got:\n%s", wantFormatQuery, got)
 			}
 		})
 	}

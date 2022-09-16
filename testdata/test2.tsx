@@ -1,4 +1,4 @@
-const Tes2Query = gql(/* GraphQL */ `
+const Test2Query = gql(/* GraphQL */ `
     query Query {
         field
     }
